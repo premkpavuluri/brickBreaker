@@ -127,9 +127,18 @@
     return false;
   };
 
+  const showGameOver = (board) => {
+    const promtElement = document.createElement('h2');
+    const boardEle = document.getElementById(board.id);
+
+    promtElement.id = 'game-over';
+    promtElement.innerText = 'Game Over';
+    boardEle.appendChild(promtElement);
+  };
+
   const stopIfGameOver = (game, intervalId) => {
     if (isGameOver(game)) {
-      alert('Game over');
+      showGameOver(game.board);
       clearInterval(intervalId);
     }
   };

@@ -27,3 +27,10 @@
   border: 1px solid black;
   position: relative;
 }
+
+#game-over {
+  color: red;
+  height: 300px;
+  width: 500px;
+  text-align: center;
+}
