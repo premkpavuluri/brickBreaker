@@ -1,6 +1,12 @@
+.game {
+  position: fixed;
+  top: 100px;
+  left: 600px;
+}
+
 .board {
   border: 1px solid black;
-  position: relative;
+  position: absolute;
 }
 
 .ball {
@@ -13,5 +19,5 @@
 
 #paddle {
   border: 1px solid black;
-  position: absolute;
+  position: relative;
 }

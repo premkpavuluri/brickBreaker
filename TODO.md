@@ -1,6 +1,7 @@
 # Brick Breaker
 
 - **TODO:**
+  - [ ] Refactor code.
   - [ ] Create entity for paddle
   - [ ] create entity for grid.
 
