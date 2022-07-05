@@ -116,14 +116,16 @@
     const rangeEnd = rangeStart + paddle.width;
     const { positions, dia } = ball.getDetails();
 
+    const isBallInRange = positions.x > rangeStart && positions.x < rangeEnd;
+
     if (positions.y + dia >= paddle.positions.y) {
-      if (positions.x < rangeStart && positions.x > rangeEnd) {
+      if (!isBallInRange) {
         console.log('lost');
-        return false;
+        return true;
       }
     }
 
-    return true;
+    return false;
   };
 
   const initializeEntities = () => {
@@ -132,7 +134,7 @@
     const paddle = {
       id: 'paddle',
       positions: { x: 10, y: 500 },
-      width: 50, height: 10,
+      width: 100, height: 10,
       speed: { dx: 10, dy: 3 }
     };
 
