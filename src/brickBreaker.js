@@ -111,7 +111,7 @@
     paddleElement.style.top = y;
   };
 
-  const isGameOver = ({ board, paddle, ball }) => {
+  const isGameOver = ({ paddle, ball }) => {
     const rangeStart = paddle.positions.x;
     const rangeEnd = rangeStart + paddle.width;
     const { positions, dia } = ball.getDetails();
@@ -120,12 +120,25 @@
 
     if (positions.y + dia >= paddle.positions.y) {
       if (!isBallInRange) {
-        console.log('lost');
         return true;
       }
     }
 
     return false;
+  };
+
+  const stopIfGameOver = (game, intervalId) => {
+    if (isGameOver(game)) {
+      alert('Game over');
+      clearInterval(intervalId);
+    }
+  };
+
+  const drawEntities = (game) => {
+    const boardElement = document.getElementById(game.board.id);
+    drawBoard(game.board, boardElement);
+    createBall(game.ball, boardElement);
+    drawPaddle(game.paddle, boardElement);
   };
 
   const initializeEntities = () => {
@@ -143,25 +156,18 @@
 
   const main = () => {
     const game = initializeEntities();
-
-    const boardElement = document.getElementById(game.board.id);
-    drawBoard(game.board, boardElement);
-    createBall(game.ball, boardElement);
-    drawPaddle(game.paddle, boardElement);
+    drawEntities(game);
 
     document.onkeydown = (event) => {
       movePaddle(game.paddle, game.board, event);
       animatePaddle(game.paddle);
-      console.log(game.paddle);
     };
 
     const intervalId = setInterval(() => {
       game.ball.moveBall(game.board);
       animateBall(game.ball);
-      isGameOver(game);
+      stopIfGameOver(game, intervalId);
     }, 30);
-
-    // setTimeout(() => clearInterval(intervalId), 10000);
   };
 
   window.onload = main;
