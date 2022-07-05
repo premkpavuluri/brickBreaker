@@ -1,40 +1,6 @@
 (function () {
   const px = (value) => `${value}px`;
 
-  const drawBoard = (board, boardEle) => {
-    const { top, bottom, left, right } = board;
-
-    boardEle.style.height = px((bottom - top));
-    boardEle.style.width = px((right - left));
-    boardEle.style.left = px(left);
-    boardEle.style.top = px(top);
-
-    return true;
-  };
-
-  const createBall = (ball, board) => {
-    const { id, positions: { x, y } } = ball.getDetails();
-    const ballElement = document.createElement('div');
-
-    ballElement.id = id;
-    ballElement.className = 'ball';
-    ballElement.style.left = px(x);
-    ballElement.style.top = px(y);
-    board.appendChild(ballElement);
-
-    return;
-  };
-
-  const animateBall = (ball) => {
-    const { id, positions: { x, y } } = ball.getDetails();
-
-    const ballElement = document.getElementById(id);
-    ballElement.style.left = x;
-    ballElement.style.top = y;
-
-    return true;
-  };
-
   class Ball {
     #id;
     #positions;
@@ -75,8 +41,94 @@
     }
   }
 
+  class Paddle {
+    #id;
+    #position;
+    #width;
+    #height;
+    #speed;
+
+    constructor(id, position, width, height, speed) {
+      this.#id = id;
+      this.#position = position;
+      this.#width = width;
+      this.#height = height;
+      this.#speed = speed;
+    }
+
+    movePaddle(direction, board) {
+      const { left, right } = board;
+
+      if (direction === 'left' && this.#position.x > left) {
+        this.#position.x -= this.#speed.dx;
+      }
+
+      if (direction === 'right' && this.#position.x + this.#width < right) {
+        this.#position.x += this.#speed.dx;
+      }
+    }
+
+    getDetails() {
+      const { x, y } = this.#position;
+      const { dx, dy } = this.#speed;
+
+      return {
+        id: this.#id,
+        position: { x, y },
+        speed: { dx, dy },
+        height: this.#height,
+        width: this.#width
+      }
+    }
+  }
+
+  const translateKeys = (key) => {
+    const keys = {
+      'ArrowLeft': 'left',
+      'ArrowRight': 'right',
+      'ArrowDown': 'down',
+      'ArrowUp': 'up'
+    }
+
+    return keys[key];
+  };
+
+  const drawBoard = (board, boardEle) => {
+    const { top, bottom, left, right } = board;
+
+    boardEle.style.height = px((bottom - top));
+    boardEle.style.width = px((right - left));
+    boardEle.style.left = px(left);
+    boardEle.style.top = px(top);
+
+    return true;
+  };
+
+  const createBall = (ball, board) => {
+    const { id, positions: { x, y } } = ball.getDetails();
+    const ballElement = document.createElement('div');
+
+    ballElement.id = id;
+    ballElement.className = 'ball';
+    ballElement.style.left = px(x);
+    ballElement.style.top = px(y);
+    board.appendChild(ballElement);
+
+    return;
+  };
+
+  const animateBall = (ball) => {
+    const { id, positions: { x, y } } = ball.getDetails();
+
+    const ballElement = document.getElementById(id);
+    ballElement.style.left = x;
+    ballElement.style.top = y;
+
+    return true;
+  };
+
   const drawPaddle = (paddle, board) => {
-    const { id, positions: { x, y }, width, height } = paddle;
+    const { id, position: { x, y }, width, height } = paddle.getDetails();
     const paddleElement = document.createElement('div');
 
     paddleElement.id = id;
@@ -87,24 +139,8 @@
     board.appendChild(paddleElement);
   };
 
-  const movePaddle = (paddle, board, event) => {
-    const { positions: { x, y }, width } = paddle;
-    const { left, right } = board;
-
-    const isLeftArrow = event.code === 'ArrowLeft';
-    const isRightArrow = event.code === 'ArrowRight';
-
-    if (isLeftArrow && x > left) {
-      paddle.positions.x -= paddle.speed.dx;
-    }
-
-    if (isRightArrow && x + width < right) {
-      paddle.positions.x += paddle.speed.dx;
-    }
-  };
-
   const animatePaddle = (paddle) => {
-    const { id, positions: { x, y } } = paddle;
+    const { id, position: { x, y } } = paddle.getDetails();
 
     const paddleElement = document.getElementById(id);
     paddleElement.style.left = x;
@@ -112,22 +148,20 @@
   };
 
   const isGameOver = ({ paddle, ball }) => {
-    const rangeStart = paddle.positions.x;
-    const rangeEnd = rangeStart + paddle.width;
+    const { position: { x, y }, width } = paddle.getDetails();
+    const rangeEnd = x + width;
     const { positions, dia } = ball.getDetails();
 
-    const isBallInRange = positions.x > rangeStart && positions.x < rangeEnd;
+    const isBallInRange = positions.x > x && positions.x < rangeEnd;
 
-    if (positions.y + dia >= paddle.positions.y) {
-      if (!isBallInRange) {
-        return true;
-      }
+    if (positions.y + dia >= y && !isBallInRange) {
+      return true;
     }
 
     return false;
   };
 
-  const showGameOver = (board) => {
+  const displayGameOverMessage = (board) => {
     const promtElement = document.createElement('h2');
     const boardEle = document.getElementById(board.id);
 
@@ -138,7 +172,7 @@
 
   const stopIfGameOver = (game, intervalId) => {
     if (isGameOver(game)) {
-      showGameOver(game.board);
+      displayGameOverMessage(game.board);
       clearInterval(intervalId);
     }
   };
@@ -153,12 +187,10 @@
   const initializeEntities = () => {
     const board = { id: 'board', top: 0, left: 0, bottom: 500, right: 500 };
     const ball = new Ball('ball-1', { x: 100, y: 100 }, 20, { dx: 2, dy: 3 });
-    const paddle = {
-      id: 'paddle',
-      positions: { x: 10, y: 500 },
-      width: 100, height: 10,
-      speed: { dx: 10, dy: 3 }
-    };
+    const paddle = new Paddle('paddle',
+      { x: 10, y: 500 },
+      100, 10,
+      { dx: 10, dy: 3 });
 
     return { board, ball, paddle };
   };
@@ -168,7 +200,7 @@
     drawEntities(game);
 
     document.onkeydown = (event) => {
-      movePaddle(game.paddle, game.board, event);
+      game.paddle.movePaddle(translateKeys(event.code), game.board);
       animatePaddle(game.paddle);
     };
 

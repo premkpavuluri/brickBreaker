@@ -1,10 +1,11 @@
 # Brick Breaker
 
 - **TODO:**
-  - [ ] Create entity for paddle
   - [ ] create entity for grid.
+  - [ ] Consider game entity.
 
 - **DONE:**
+  - [x] Create entity for paddle
   - [x] Refactor code.
   - [x] Make ball bounce on paddle.
   - [x] connect paddle and grid.
