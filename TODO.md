@@ -5,9 +5,9 @@
     - [ ] Delegate the boundary checks of ball,paddle to game.
   - [ ] make method in paddle to check whether ball hitted or not.
   - [ ] include bricks in the game.
-  - [ ] Extract move operation in paddle.
 
 - **DONE:**
+  - [x] Extract move operation in paddle.
   - [x] delegate the boundaries check to view entity.
   - [x] create entity for grid(view).
   - [x] Create entity for paddle

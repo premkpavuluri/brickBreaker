@@ -100,16 +100,24 @@
       this.#speed = speed;
     }
 
+    moveLeft() {
+      this.#position.x -= this.#speed.dx;
+    }
+
+    moveRight() {
+      this.#position.x += this.#speed.dx;
+    }
+
     move(direction, view) {
       const { x, y } = this.#position;
       const maxX = x + this.#width;
 
       if (direction === 'left' && !view.isAtLeftEdge({ x, y })) {
-        this.#position.x -= this.#speed.dx;
+        this.moveLeft();
       }
 
       if (direction === 'right' && !view.isAtRightEdge({ x: maxX, y })) {
-        this.#position.x += this.#speed.dx;
+        this.moveRight();
       }
     }
 
@@ -233,7 +241,7 @@
     const view = new View('board', 0, 0, 500, 500);
     const ball = new Ball('ball-1', { x: 100, y: 100 }, 20, { dx: 2, dy: 3 });
     const paddle = new Paddle('paddle',
-      { x: 10, y: 500 },
+      { x: 250, y: 500 },
       100, 10,
       { dx: 10, dy: 3 });
 
